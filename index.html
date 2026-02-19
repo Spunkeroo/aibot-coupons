@@ -235,13 +235,13 @@
   <div class="footer-links">
     <a href="https://aibot.beer">aibot.beer</a>
     <a href="https://aibot.courses">aibot.courses</a>
+    <a href="https://stake.com/?c=MyXSehCn" target="_blank" rel="noopener sponsored" style="color:#1475e1;font-size:0.65rem;font-weight:700;text-decoration:none;">Stake.com</a>
+    <a href="https://stake.us/?c=L2a8nG6c" target="_blank" rel="noopener sponsored" style="color:#00c74d;font-weight:600;">Stake.us</a>
+    <a href="https://winna.com/?r=Spunkeroo" target="_blank" rel="noopener sponsored" style="color:#ff5f1f;font-weight:600;">Winna.com</a>
     <a href="https://coinbase.com/join/YAGES3X?src=referral-link" target="_blank" rel="noopener sponsored" style="color:#0052ff;font-weight:600;">Buy Crypto</a>
     <a href="https://shop.ledger.com/?r=0553c9ea1441" target="_blank" rel="noopener sponsored" style="color:#ff5500;font-weight:600;">Secure Crypto</a>
     <a href="https://kalshi.com/sign-up/?referral=6b723b42-d0c9-4421-9b4e-5af4b4c6c42c" target="_blank" rel="noopener sponsored" style="color:#00d084;font-weight:600;">Kalshi</a>
     <a href="https://everyx.io/register?ref=AYHl4YqvjcaX" target="_blank" rel="noopener sponsored" style="color:#a855f7;font-weight:600;">EveryX</a>
-    <a href="https://winna.com/?r=Spunkeroo" target="_blank" rel="noopener sponsored" style="color:#ff5f1f;font-weight:600;">Winna.com</a>
-    <a href="https://stake.us/?c=L2a8nG6c" target="_blank" rel="noopener sponsored" style="color:#00c74d;font-weight:600;">Stake.us</a>
-    <a href="https://stake.com/?c=MyXSehCn" target="_blank" rel="noopener sponsored" style="color:#1475e1;font-size:0.65rem;font-weight:700;text-decoration:none;">Stake.com</a>
     <a href="https://spunk.bet" target="_blank" rel="noopener sponsored" style="color:#ff5f1f;font-weight:600;">Spunk.Bet</a>
     <a href="https://x.com/SpunkArt13" target="_blank" rel="noopener noreferrer">@SpunkArt13</a>
   </div>
@@ -424,67 +424,64 @@ function generateSmartResponse(query) {
   const q = query.toLowerCase();
   const responses = getResponses();
 
-  // Try to match a keyword-based response
+  let bestMatch = null;
+  let bestScore = 0;
   for (const [keywords, response] of responses) {
-    if (keywords.some(k => q.includes(k))) {
-      return response;
+    const score = keywords.filter(k => q.includes(k)).length;
+    if (score > bestScore) { bestScore = score; bestMatch = response; }
+  }
+  if (bestMatch) return bestMatch;
+
+  return generateContextualCouponResponse(query);
+}
+
+function generateContextualCouponResponse(query) {
+  const q = query.toLowerCase();
+
+  // Detect specific stores
+  const stores = {'walmart':'Walmart','target':'Target','amazon':'Amazon','best buy':'Best Buy','bestbuy':'Best Buy','costco':'Costco','nike':'Nike','adidas':'Adidas','apple':'Apple','home depot':'Home Depot','lowes':'Lowe\'s','macys':'Macy\'s','nordstrom':'Nordstrom','sephora':'Sephora','ulta':'Ulta','shein':'SHEIN','temu':'Temu','ebay':'eBay','etsy':'Etsy','wayfair':'Wayfair','ikea':'IKEA','uber':'Uber','doordash':'DoorDash','grubhub':'Grubhub','instacart':'Instacart','netflix':'Netflix','spotify':'Spotify','disney':'Disney+','hulu':'Hulu','youtube':'YouTube Premium'};
+  for (const [key, name] of Object.entries(stores)) {
+    if (q.includes(key)) {
+      const tips = {
+        'Amazon': '**Subscribe & Save** (5-15% off), **Warehouse Deals** (20-50% off open-box), **amazon.com/coupons** page, price track with CamelCamelCamel, check Woot.com (Amazon-owned) for daily deals',
+        'Target': '**Target Circle** app (free, personalized deals), **RedCard** (5% off everything), stack manufacturer coupons + Target Circle offers, price match within 14 days',
+        'Walmart': '**Walmart+** ($12.99/mo for free delivery + fuel discounts), price match guarantee, use Ibotta for cash back on groceries, Rollback section online',
+        'Best Buy': '**My Best Buy** membership (free, earns points), **Open-box deals** (up to 50% off), price match Amazon/Costco/Target, student discount program',
+        'Costco': '**Executive membership** (2% cash back), buy Costco gift cards at a discount, shop end-of-season clearance, tire deals are unbeatable',
+        'Nike': '**Nike Members** (free, early access + birthday discount), **Nike Refurbished** (like-new for 40% off), student discount 10%, use Rakuten for 5-8% back',
+        'Sephora': '**Beauty Insider** (free tier gets birthday gift), save points for Rouge tier, **fragrance sampler sets** (try before committing), 15-20% off sales twice yearly',
+        'SHEIN': '**First order 15% off** (always available), free shipping over $29, check-in daily for points, student discount 15%',
+      };
+      const storeTip = tips[name] || `Sign up for ${name}'s email list for 10-15% off first order, use Rakuten/TopCashback for extra cash back, check RetailMeNot for current codes`;
+      return `**${name} — Best Ways to Save**\n\n${storeTip}\n\n**Universal Strategies:**\n1. Install Honey browser extension (auto-applies codes)\n2. Check Rakuten for cash back (2-15%)\n3. Google "${name.toLowerCase()} promo code" before checkout\n4. Sign up for email list → get welcome discount → unsubscribe\n5. Use a cash back credit card (2-5% extra)\n\n**Best Times to Buy at ${name}:**\n- Black Friday / Cyber Monday\n- End of season clearance\n- Back to school (Aug-Sep)\n- Prime Day (even non-Amazon stores run competing sales)\n\n**Try asking me:** "Best coupon codes for ${name}" or "How to stack discounts at ${name}"`;
     }
   }
 
-  // Default response
-  return `Great question! Here's what ${BOT_NAME} thinks:\n\n` +
-    `Based on your query about "${query.substring(0, 50)}...", here are some key points:\n\n` +
-    `**1. Overview**\nThis is a topic with several important considerations. Let me break it down for you.\n\n` +
-    `**2. Key Factors**\n- Consider your specific needs and context\n- Research current options and pricing\n- Look at reviews and recommendations from trusted sources\n- Compare at least 3 alternatives before deciding\n\n` +
-    `**3. Recommendation**\nFor the most detailed, personalized answer, upgrade to unlimited ${BOT_NAME} access. Our AI will give you specific, actionable advice tailored to your exact situation.\n\n` +
-    `Want a more specific answer? Try asking with more details about your situation!`;
+  // Detect category questions
+  if (q.match(/grocery|food|meal|cook|kitchen/)) {
+    return `**Grocery Savings Guide**\n\n**Apps That Pay You Cash Back:**\n1. **Ibotta** — Scan receipts, earn cash (avg $20-50/month)\n2. **Fetch Rewards** — Scan any receipt, earn points\n3. **Checkout 51** — Weekly offers on groceries\n4. **Shopkick** — Earn points just for walking into stores\n\n**Store Strategies:**\n- **Aldi/Lidl**: Already 30-50% cheaper than regular stores\n- **Costco/Sam's**: Best for bulk staples, meat, cheese\n- **Walmart Pickup**: Price match + use Ibotta\n- **Target Circle**: Free app with personalized grocery deals\n\n**Meal Planning = Biggest Saver:**\n1. Plan meals around what's on sale this week\n2. Buy in bulk when your staples are discounted\n3. Use the Flipp app to browse all local store flyers\n4. Never shop hungry (seriously, saves 20%+)\n\n**Avg Savings:** $200-400/month for a family of 4 using these strategies.`;
+  }
+
+  if (q.match(/travel|flight|hotel|airbnb|vacation|trip/)) {
+    return `**Travel Deal Finder**\n\n**Flights:**\n- **Google Flights**: Best overall search + price tracking\n- **Skiplagged**: Hidden city ticketing (controversial but legal)\n- **Scott's Cheap Flights**: Email alerts for mistake fares (free tier)\n- **Book Tue-Thu** for cheapest fares, fly Tue/Wed for cheapest days\n\n**Hotels:**\n- **Booking.com**: Best selection + Genius loyalty discounts\n- **Hotels.com**: Buy 10 nights get 1 free\n- **Hotwire**: Blind booking = 60% off brand hotels\n- **Call the hotel directly** — often match or beat online prices\n\n**Money-Saving Hacks:**\n1. Use incognito mode (prices increase with repeat searches)\n2. Book refundable rate, then check for price drops\n3. Credit card travel portals (Chase, Amex) offer bonus points\n4. Airbnb is only cheaper for 4+ people or long stays\n\n**Best Time to Book:** Domestic flights 1-3 months out, international 2-8 months out.`;
+  }
+
+  if (q.match(/phone|iphone|samsung|android|laptop|computer|tech|electronics/)) {
+    return `**Tech & Electronics Deals**\n\n**Best Times to Buy:**\n- **iPhones**: September (new release, old models drop $100-200)\n- **Laptops**: Back to school (July-Aug) or Black Friday\n- **TVs**: Super Bowl week (Jan-Feb) or Black Friday\n- **General electronics**: Amazon Prime Day (July)\n\n**Where to Find Deals:**\n- **Slickdeals.net**: Community-voted best deals (check daily)\n- **CamelCamelCamel**: Amazon price history (never overpay)\n- **Best Buy Open Box**: Up to 50% off, full warranty\n- **Amazon Renewed**: Refurbished electronics with 90-day guarantee\n- **Apple Refurbished Store**: Like-new Apple products, full warranty\n\n**Pro Tips:**\n1. Never buy tech at launch — wait 2-3 months for price drops\n2. Previous-gen is 90% as good for 50% less\n3. Price match at Best Buy (they match Amazon, Costco, Target)\n4. Use Rakuten for 2-8% cash back on electronics`;
+  }
+
+  // Smart default
+  return `**CouponBot — Let Me Help You Save!**\n\nHere's my best general advice for saving money on "${query.substring(0,50)}":\n\n**Step 1: Before You Buy Anything**\n1. Install **Honey** browser extension (auto-finds codes at checkout)\n2. Open **Rakuten** (earn 2-15% cash back at 3500+ stores)\n3. Google "[store name] promo code" — check top 3 results\n\n**Step 2: Stack Your Savings**\n- Email signup discount (10-15% off first order)\n- + Coupon code from Honey/RetailMeNot\n- + Cash back from Rakuten/TopCashback\n- + Cash back credit card (2-5%)\n- = **15-35% total savings on most purchases**\n\n**Step 3: Time It Right**\n- Black Friday / Cyber Monday: Best all-around\n- Prime Day (July): Tech + Amazon deals\n- End of season: Clothing 50-70% off\n- Holiday clearance (Jan, post-July 4th)\n\n**Try asking me about a specific store** (Amazon, Target, Nike, etc.) or **category** (groceries, travel, electronics) for targeted advice!`;
 }
 
 function getResponses() {
-  // Site-specific response templates
   return [
-  [["amazon", "save", "deal"], `**Amazon Money-Saving Strategies**
-
-**Browser Extensions (Install These):**
-- **Honey** (PayPal) — Auto-applies coupon codes at checkout
-- **Camelcamelcamel** — Price history tracker (never overpay)
-- **Capital One Shopping** — Finds better prices elsewhere
-
-**Amazon-Specific Tricks:**
-- **Subscribe & Save**: 5-15% off recurring items, cancel anytime
-- **Warehouse Deals**: Open-box/returned items, 20-50% off
-- **Coupon Page**: amazon.com/coupons — clip before buying
-- **Price tracking**: Add items to your cart and wait — prices fluctuate daily
-- **Amazon Day delivery**: Consolidate deliveries for credits
-
-**Best Times to Buy:**
-- **Prime Day** (July): Best deals on Amazon devices, electronics
-- **Black Friday/Cyber Monday**: Wide discounts
-- **January**: Post-holiday clearance
-
-**Pro Tip:** Before buying ANYTHING on Amazon, check the price on Google Shopping. Amazon isn't always cheapest.`],
-  [["coupon", "code", "promo", "discount"], `**Finding the Best Coupon Codes**
-
-**Browser Extensions (auto-apply at checkout):**
-1. Honey (most popular, wide coverage)
-2. Capital One Shopping (also finds lower prices)
-3. Cently (works where Honey doesn't)
-
-**Manual Coupon Sites:**
-- RetailMeNot.com (largest database)
-- Coupons.com (grocery focused)
-- Slickdeals.net (community-verified deals)
-- Brad's Deals (curated, tested codes)
-
-**Coupon Stacking Strategy:**
-1. Check for store-specific email signup discount (usually 10-15%)
-2. Apply a coupon code from extension or site
-3. Use cashback (Rakuten, TopCashback) — 1-15% back
-4. Pay with a cashback credit card — another 2-5%
-
-**Total savings: 15-35% on most purchases!**
-
-**Pro Tip:** Sign up for store emails with a burner email — most offer 10-15% off first order. Then unsubscribe.`]
+  [["amazon", "save", "deal", "prime"], `**Amazon Money-Saving Strategies**\n\n**Browser Extensions (Install These):**\n- **Honey** — Auto-applies coupon codes at checkout\n- **CamelCamelCamel** — Price history tracker (never overpay)\n- **Capital One Shopping** — Finds better prices elsewhere\n\n**Amazon-Specific Tricks:**\n- **Subscribe & Save**: 5-15% off recurring items, cancel anytime\n- **Warehouse Deals**: Open-box items, 20-50% off\n- **Coupon Page**: amazon.com/coupons — clip before buying\n- **Price tracking**: CamelCamelCamel alerts when price drops\n\n**Best Times to Buy:**\n- **Prime Day** (July): Best on Amazon devices, electronics\n- **Black Friday/Cyber Monday**: Wide discounts\n- **January**: Post-holiday clearance`],
+  [["coupon", "code", "promo", "discount", "voucher"], `**Finding the Best Coupon Codes**\n\n**Auto-Apply Extensions:**\n1. Honey (most popular, wide coverage)\n2. Capital One Shopping (also finds lower prices)\n3. Cently (works where Honey doesn't)\n\n**Manual Coupon Sites:**\n- RetailMeNot.com (largest database)\n- Coupons.com (grocery focused)\n- Slickdeals.net (community-verified deals)\n\n**Stacking Strategy:**\n1. Email signup discount (10-15%)\n2. + Coupon code (5-20%)\n3. + Cash back via Rakuten (1-15%)\n4. + Cash back credit card (2-5%)\n\n**= 15-35% total savings!**`],
+  [["cashback", "cash back", "rakuten", "ibotta", "rebate"], `**Cash Back Guide — Free Money**\n\n**Online Shopping:**\n1. **Rakuten** — 2-15% back at 3500+ stores ($10 sign-up bonus)\n2. **TopCashback** — Often higher rates than Rakuten\n3. **BeFrugal** — Best rates on some stores\n4. **RetailMeNot** — Coupons + cash back combo\n\n**Groceries:**\n1. **Ibotta** — Scan receipts, avg $20-50/month back\n2. **Fetch Rewards** — Points for any receipt\n3. **Checkout 51** — Weekly grocery offers\n\n**Credit Cards (bonus layer):**\n- Chase Freedom Flex: 5% rotating categories\n- Citi Double Cash: 2% on everything\n- Capital One SavorOne: 3% dining + grocery\n\n**Pro Move:** Stack store coupon + Rakuten + cashback card = triple dip on every purchase.`],
+  [["student", "college", "university", "edu"], `**Student Discounts You're Missing**\n\n**Tech:**\n- Apple: Education pricing ($100-200 off Macs)\n- Microsoft: Free Office 365\n- Adobe: Creative Cloud 60% off ($22/mo vs $55)\n- GitHub: Free Pro + $200 cloud credits\n- Amazon Prime: 50% off ($7.49/mo)\n\n**Shopping:**\n- Nike: 10% off\n- Adidas: 30% off\n- ASOS: 10% off\n- Samsung: Up to 30% off\n- Spotify + Hulu: $5.99/mo bundle\n\n**How to Verify:**\n- UNiDAYS (most brands)\n- SheerID (auto-verify .edu email)\n- Student Beans app\n\n**Even After Graduation:** Some discounts work up to 6 months post-grad. Stock up!`],
+  [["subscription", "cancel", "recurring", "monthly", "annual", "membership"], `**Subscription Savings Guide**\n\n**Audit Your Subscriptions:**\n1. Check bank/card statements for recurring charges\n2. Use **Trim** or **Rocket Money** to find forgotten subs\n3. Average American wastes $133/month on unused subscriptions\n\n**Negotiation Scripts (actually work):**\n- "I'd like to cancel" → most will offer 20-50% off to stay\n- "I found a better price at [competitor]" → they'll price match\n- "Can I switch to annual billing?" → usually 20-40% cheaper\n\n**Sharing is Saving:**\n- Netflix, Spotify, YouTube Premium, Apple One — all have family plans\n- Split cost = 50-70% cheaper per person\n\n**Free Alternatives:**\n- Netflix → Tubi, Pluto TV, Kanopy (free with library card)\n- Spotify → YouTube Music (free tier), Spotify free\n- Audible → Libby (free audiobooks from your library!)`],
+  [["black friday", "cyber monday", "holiday", "christmas", "sale"], `**Black Friday / Cyber Monday Strategy**\n\n**What's Actually Cheap:**\n- TVs (30-50% off — best deals of the year)\n- Amazon devices (Echo, Fire TV, Kindle — 50% off)\n- Clothing (40-60% off at most retailers)\n- Toys (best prices of the year)\n\n**What's NOT Actually Cheaper:**\n- Apple products (small discounts, buy refurbished instead)\n- Furniture (Presidents Day sales are better)\n- Fitness equipment (wait for January New Year sales)\n\n**Strategy:**\n1. Make your list NOW — don't impulse buy\n2. Set CamelCamelCamel price alerts\n3. Check prices BEFORE Black Friday (fake "discounts" are common)\n4. Stack: sale price + coupon code + Rakuten + cashback card\n5. Cyber Monday often has BETTER deals than Black Friday`]
 ];
 }
 
